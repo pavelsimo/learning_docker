@@ -168,4 +168,121 @@ Creating a Java Container
     RUN cd ~ && echo "export JAVA_HOME=/usr/java/jdk1.8.0/jre" >> /home/user/.bashrc
     ENV JAVA_BIN /usr/java/jdk1.8.0/jre/bin
 
+Using the Dockerfile ENV directive to create an env variable for all users
+
+    ENV JAVA_BIN /usr/java/jdk1.8.0/jre/bin
+
+The Dockerfile CMD directive it's used to run commands after the container is created, it differs from the RUN directive which create a file system layer.
+
+    CMD "echo" "Hello World!"
+
+The Dockerfile ENTRYPOINT directive, enforce the default behaviour each time our container is created, it differs from CMD which can be alter by the default program that we run with the container.
+
+    ENTRYPOINT echo "This message will always appear"
+
+Run a container with a name
+
+    docker run -d --name apacheweb1 centos7/apache:v1
+    docker run -d --name apacheweb3 -p 8080:80 centos7/apache:v1
+
+Exposing ports in a Dockerfile
+
+    FROM centos:latest
+    MAINTAINER pavel.simo@gmail.com
+
+    RUN yum update -y
+    RUN yum install -y httpd net-tools
+
+    RUN echo "This is a custom index file build during the image creation" > /var/www/html/index.html
+
+    EXPOSE 80
+
+    ENTRYPOINT apachectl "-DFOREGROUND"
+
+The docker run -P option automatically map all the ports exposed by the container
+
+    docker run -d --name apacheweb4 -P centos7/apache:v1 
+
+Create a container with host volume
+
+    docker run -it --name voltest1 -v /data centos:latest /bin/bash
+
+Create a container with host volume in a specific directory
+
+    docker run -it --name voltest2 -v /root/Builds/MyHostDir:/data centos:latest /bin/bash
+
+If you run into permission denied issues could be related with selinux two solutions:
+
+    # http://stackoverflow.com/questions/24288616/permission-denied-on-accessing-host-directory-in-docker
+    su -c "setenforce 0"
+
+    # http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/
+    # notice the use of :Z at the end, this will let selinux knows about this sandbox volume
+    docker run -it --name voltest6 -v /root/Builds/MyHostDir:/data2:Z centos:latest /bin/bash
+    
+List all the docker networks associated with the current host
+
+    docker network ls
+
+    # don't truncate the network id
+    docker network ls --no-trunc
+
+Get information about the bridge network
+
+    docker network inspect bridge
+
+Get the man pages for a composite docker command
+
+    # man page for the command docker network create
+    man docker-network-create
+
+    # man page for the command docker run
+    man docker-run
+
+Create a docker network
+
+    docker network create --subnet 10.1.0.0/24 --gateway 10.1.0.1 mybridge01
+    docker network create --subnet 10.1.0.0/16 --gateway 10.1.0.1 --ip-range=10.1.4.0/24 --driver=bridge --label=host4network bridge04
+
+Delete a docker network
+
+    docker network rm mybridge01
+
+Run a container within a given network
+
+    docker run -it --name nettest1 --net bridge04 centos:latest /bin/bash
+
+    # using a specific ip address, notice this just work for custom networks, will not work for docker0 bridge
+    docker run -it --name nettest2 --net bridge04 --ip 10.1.4.100 centos:latest /bin/bash
+
+Display the running process in a container
+
+    docker top tender_kalam
+
+Running a container bash (this way does not close the container on exit)
+
+    docker exec -i -t tender_kalam /bin/bash
+
+Display a live stream of a container(s) resource usage statistics
+
+    docker stats tender_kalam nettest2
+
+Counting the previous run containers
+
+    docker ps -a -q | wc -l
+
+Removing a running container
+
+    docker rm -f tender_kalam
+
+Delete all stopped containers
+
+    docker rm `docker ps -a -q`
+
+You can manually delete a container by deleting it from the docker containers directory
+
+   systemctl stop docker
+   rm -rf /var/lib/docker/containers/04493c3d458a4b35b0df98969a28ef467aaac3556f94a411ca59890f23a75d0c
+
+
 
