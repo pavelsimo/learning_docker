@@ -1,17 +1,20 @@
 
-Basic Docker commands
+Docker information
 
     docker info
     docker version
     
-    # location where docker images live
-    # /var/lib/docker/image
-    # /var/lib/docker/image/devicemapper/imagedb/content/sha256
+Location where docker images live
 
-    # location where docker container lives
-    # /var/lib/docker/containers
+    /var/lib/docker/image
+    /var/lib/docker/image/devicemapper/imagedb/content/sha256
 
-    # pull ubuntu xenial
+Location where docker container lives
+
+    /var/lib/docker/containers
+
+Pulling ubuntu xenial image
+
     docker pull ubuntu:xenial
     docker pull nginx:latest
 
@@ -19,34 +22,45 @@ Basic Docker commands
     # -t attached to my terminal (tty)
     docker run -i -t ubuntu:xenial /bin/bash
 
-    # restart docker container
+Restart docker container
+
     docker restart awesome_sinoussi
 
-    # inspect images
+Inspect an image
+
     docker inspect ubuntu:xenial
 
-    # attach to the container
+
+Attach to a container
+
     docker attach awesome_sinoussi
+
+Run a container as a deamon
 
     # -i interactive mode
     # -t attached to my terminal (tty)
     # -d demonized
     docker run -itd ubuntu:xenial /bin/bash
 
-    # obtain container specific information
+Inspect a container 
+
     docker inspect reverent_thompson
 
-    # start a container
+Start a container
+
     docker start focused_kilby
 
-    # stop a container
+Stop a container
+
     docker stop reverent_thompson
 
-    # search docker images
+Search docker images
+
     docker search ubuntu
     docker search training/sinatra
 
-    # remove docker image
+Remove docker image
+
     docker rmi training/sinatra
     
 Build a docker image
@@ -131,6 +145,12 @@ Expose a container port
     # 80   - CONTAINER PORT
     docker run -d -p 8000:80 nginx:latest
 
+    # exposing more than one port
+    docker run -itd -p 8080:80 -p 8081:443 nginx:latest
+
+    # exposing only in the localhost
+    docker run -itd -p 127.0.0.1:8000:80 nginx:latest
+
 Remove a Docker Image
 
     docker rmi e0870be525d9
@@ -182,7 +202,7 @@ The Dockerfile ENTRYPOINT directive, enforce the default behaviour each time our
 
 Run a container with a name
 
-    docker run -d --name apacheweb1 centos7/apache:v1
+    docker run -d --name apacheweb1 centos7/apache:v1    
     docker run -d --name apacheweb3 -p 8080:80 centos7/apache:v1
 
 Exposing ports in a Dockerfile
@@ -259,7 +279,7 @@ Display the running process in a container
 
     docker top tender_kalam
 
-Running a container bash (this way does not close the container on exit)
+Running a container bash (the container will not close on exit)
 
     docker exec -i -t tender_kalam /bin/bash
 
@@ -281,8 +301,33 @@ Delete all stopped containers
 
 You can manually delete a container by deleting it from the docker containers directory
 
-   systemctl stop docker
-   rm -rf /var/lib/docker/containers/04493c3d458a4b35b0df98969a28ef467aaac3556f94a411ca59890f23a75d0c
+    systemctl stop docker
+    rm -rf /var/lib/docker/containers/04493c3d458a4b35b0df98969a28ef467aaac3556f94a411ca59890f23a75d0c
 
+Naming a container
 
+    docker run -itd -P --name mynginx_container nginx:latest /bin/bash
 
+Renaming a container
+
+    docker rename mynginx_container mycrazycontainer
+
+Wait for Docker Events
+
+    docker events
+
+Show all the events that have happen in the last hour
+
+    docker events --since '1h'
+
+Kill a container (default signal SIGKILL)
+
+    docker kill clever_panini
+
+Listen to attach events
+
+    docker events --filter event=attach
+
+Listen to multiple events
+
+    docker events --filter event=attach --filter event=die --filter event=stop
