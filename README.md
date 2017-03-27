@@ -101,13 +101,13 @@ Delete all containers
 
 Commit a container
 
+    # this will create an image for the existing container "clever_panini"
     docker commit -m "Already install SSH and created test user" -a "pavelsimo" clever_panini pavelsimo/ubuntusshd:v1
     docker run -it pavelsimo/ubuntusshd:v1 /bin/bash
 
 Simple Dockerfile with SSH
 
     # This is a custom ubuntu image with SSH already installed
-
     FROM ubuntu:xenial
     MAINTAINER pavelsimo <pavel.simo@gmail.com>
     RUN apt-get update
@@ -331,3 +331,36 @@ Listen to attach events
 Listen to multiple events
 
     docker events --filter event=attach --filter event=die --filter event=stop
+
+Saving an image to a tar file
+
+    # first method
+    docker save centos:latest > centos.latest.tar
+
+    # second method
+    docker save -o centos.latest.tar centos:latest
+
+    # third method (more verbose)
+    docker save --output centos.latest.tar centos:latest
+
+Loading an image from a tar file
+
+    # first method
+    docker load < centos.latest.tar
+   
+    # second method
+    docker load -i centos.latest.tar    
+
+    # third method (more verbose)
+    docker load --input centos.latest.tar
+
+You can also load .tar.gz images directly
+
+    docker load --input centos.latest.tar.gz
+
+Show how an image was created
+
+    docker history centos:latest 
+
+    # don't truncate the commands
+    docker history --no-trunc centos7/java8:v1
